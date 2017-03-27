@@ -70,6 +70,7 @@ _zic_complete() {
   l=$(_zic_list_generator $@)
 
   if [ -z "$l" ]; then
+    zle ${__zic_default_completion:-expand-or-complete}
     return
   fi
 
