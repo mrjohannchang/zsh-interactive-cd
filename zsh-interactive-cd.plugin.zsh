@@ -93,7 +93,10 @@ _zic_complete() {
     local base="${(Q)@[-1]}"
     if [[ "$base" != */ ]]; then
       if [[ "$base" == */* ]]; then
-        base="$(dirname "$base")/"
+        base="$(dirname "$base")"
+        if [[ ${base[-1]} != / ]]; then
+          base="$base/"
+        fi
       else
         base=""
       fi
