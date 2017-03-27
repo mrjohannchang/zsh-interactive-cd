@@ -73,7 +73,6 @@ _zic_complete() {
     return
   fi
 
-  matches
   fzf=$(__zic_fzf_prog)
 
   if [ $(echo $l | wc -l) -eq 1 ]; then
