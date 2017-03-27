@@ -65,15 +65,16 @@ _zic_list_generator() {
 
 _zic_complete() {
   setopt localoptions nonomatch
+  local l matches fzf tokens base
 
-  local l=$(_zic_list_generator $@)
+  l=$(_zic_list_generator $@)
 
   if [ -z "$l" ]; then
     return
   fi
 
-  local matches
-  local fzf=$(__zic_fzf_prog)
+  matches
+  fzf=$(__zic_fzf_prog)
 
   if [ $(echo $l | wc -l) -eq 1 ]; then
     matches=${(q)l}
@@ -89,8 +90,8 @@ _zic_complete() {
 
   matches=${matches% }
   if [ -n "$matches" ]; then
-    local tokens=(${(z)LBUFFER})
-    local base="${(Q)@[-1]}"
+    tokens=(${(z)LBUFFER})
+    base="${(Q)@[-1]}"
     if [[ "$base" != */ ]]; then
       if [[ "$base" == */* ]]; then
         base="$(dirname "$base")"
@@ -117,9 +118,10 @@ _zic_complete() {
 
 zic-completion() {
   setopt localoptions noshwordsplit noksh_arrays noposixbuiltins
+  local tokens cmd
 
-  local tokens=(${(z)LBUFFER})
-  local cmd=${tokens[1]}
+  tokens=(${(z)LBUFFER})
+  cmd=${tokens[1]}
 
   if [[ "$LBUFFER" =~ "^\ *cd$" ]]; then
     zle ${__zic_default_completion:-expand-or-complete}
