@@ -24,12 +24,12 @@ __zic_matched_subdir_list() {
       echo "$line"
     done
   else
-    dir=$(dirname "$1")
+    dir=$(dirname -- "$1")
     length=$(echo -n "$dir" | wc -c)
     if [ "$dir" = "/" ]; then
       length=0
     fi
-    seg=$(basename "$1")
+    seg=$(basename -- "$1")
     starts_with_dir=$( \
       find -L "$dir" -mindepth 1 -maxdepth 1 -type d \
           2>/dev/null | cut -b $(( ${length} + 2 ))- | sed '/^$/d' \
@@ -94,7 +94,7 @@ _zic_complete() {
     base="${(Q)@[-1]}"
     if [[ "$base" != */ ]]; then
       if [[ "$base" == */* ]]; then
-        base="$(dirname "$base")"
+        base="$(dirname -- "$base")"
         if [[ ${base[-1]} != / ]]; then
           base="$base/"
         fi
