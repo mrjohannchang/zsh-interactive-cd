@@ -60,7 +60,7 @@ __zic_matched_subdir_list() {
 }
 
 _zic_list_generator() {
-  __zic_matched_subdir_list "${(Q)@[-1]}"
+  __zic_matched_subdir_list "${(Q)@[-1]}" | sort
 }
 
 _zic_complete() {
