@@ -153,4 +153,4 @@ zle -N zic-completion
 if [ -z $zic_custom_binding ]; then
   zic_custom_binding='^I'
 fi
-bindkey "${zic_custom_binding}" zic-completion || bindkey
+bindkey "${zic_custom_binding}" zic-completion
