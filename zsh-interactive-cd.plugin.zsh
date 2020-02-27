@@ -23,7 +23,7 @@ __zic_matched_subdir_list() {
       length=0
     fi
     find -L "$dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null \
-        | cut -b $(( ${length} + 2 ))- | \sed '/^$/d' | while read -r line; do
+        | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' | while read -r line; do
       if [[ "${line[1]}" == "." ]]; then
         continue
       fi
@@ -38,7 +38,7 @@ __zic_matched_subdir_list() {
     seg=$(basename -- "$1")
     starts_with_dir=$( \
       find -L "$dir" -mindepth 1 -maxdepth 1 -type d \
-          2>/dev/null | cut -b $(( ${length} + 2 ))- | \sed '/^$/d' \
+          2>/dev/null | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' \
           | while read -r line; do
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
@@ -52,7 +52,7 @@ __zic_matched_subdir_list() {
       echo "$starts_with_dir"
     else
       find -L "$dir" -mindepth 1 -maxdepth 1 -type d \
-          2>/dev/null | cut -b $(( ${length} + 2 ))- | \sed '/^$/d' \
+          2>/dev/null | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' \
           | while read -r line; do
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
