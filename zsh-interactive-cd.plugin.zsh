@@ -65,6 +65,17 @@ __zic_matched_subdir_list() {
   fi
 }
 
+__zic_fzf_bindings() {
+  autoload is-at-least
+  fzf=$(__zic_fzf_prog)
+
+  if $(is-at-least '0.21.0' $(${fzf} --version)); then
+    echo 'shift-tab:up,tab:down,bspace:backward-delete-char/eof'
+  else
+    echo 'shift-tab:up,tab:down'
+  fi
+}
+
 _zic_list_generator() {
   __zic_matched_subdir_list "${(Q)@[-1]}" | sort
 }
@@ -81,6 +92,7 @@ _zic_complete() {
   fi
 
   fzf=$(__zic_fzf_prog)
+  fzf_bindings=$(__zic_fzf_bindings)
 
   if [ $(echo $l | wc -l) -eq 1 ]; then
     matches=${(q)l}
@@ -88,7 +100,7 @@ _zic_complete() {
     matches=$(echo $l \
         | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} \
           --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS \
-          --bind 'shift-tab:up,tab:down'" ${=fzf} \
+          --bind '${fzf_bindings}'" ${=fzf} \
         | while read -r item; do
       echo -n "${(q)item} "
     done)
