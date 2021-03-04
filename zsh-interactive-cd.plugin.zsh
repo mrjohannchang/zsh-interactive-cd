@@ -69,7 +69,7 @@ __zic_fzf_bindings() {
   autoload is-at-least
   fzf=$(__zic_fzf_prog)
 
-  if $(is-at-least '0.21.0' $(${fzf} --version)); then
+  if $(is-at-least '0.21.0' $(${=fzf} --version)); then
     echo 'shift-tab:up,tab:down,bspace:backward-delete-char/eof'
   else
     echo 'shift-tab:up,tab:down'
