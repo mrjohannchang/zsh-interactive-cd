@@ -7,39 +7,62 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 __zic_fzf_prog() {
-  [ -n "$TMUX_PANE" ] && [ "${FZF_TMUX:-0}" != 0 ] && [ ${LINES:-40} -gt 15 ] \
-    && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+  [ -n "$TMUX_PANE" ] && \
+  [ "${FZF_TMUX:-0}" != 0 ] && \
+  [ ${LINES:-40} -gt 15 ] && \
+  echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+}
+
+__zic_calc_lenght() {
+  local length
+  if [ "$1" = "/" ]; then
+    length=0
+  else
+    length=$(echo -n "$1" | wc -c)
+  fi
+  echo "$length"
+}
+
+__zic_list_subdirs() {
+  local subdirs=$(\
+      find -L "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null \
+      | cut -b $(( ${length} + 2 ))- \
+      | command sed '/^$/d'
+  )
+  echo "$subdirs"
 }
 
 __zic_matched_subdir_list() {
-  local dir length seg starts_with_dir
+  local dir length seg subdirs
   if [[ "$1" == */ ]]; then
     dir="$1"
+
     if [[ "$dir" != / ]]; then
       dir="${dir: : -1}"
     fi
-    length=$(echo -n "$dir" | wc -c)
-    if [ "$dir" = "/" ]; then
-      length=0
-    fi
-    find -L "$dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null \
-        | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' | while read -r line; do
-      if [[ "${line[1]}" == "." ]]; then
-        continue
+
+    length=$(__zic_calc_lenght "$dir")
+
+    subdirs=$(__zic_list_subdirs "$dir" "${length}")
+
+    echo "$subdirs" \
+    | while read -r line; do
+      if [[ "${line[1]}" != "." ]]; then
+        echo "$line"
       fi
-      echo "$line"
     done
   else
     dir=$(dirname -- "$1")
-    length=$(echo -n "$dir" | wc -c)
-    if [ "$dir" = "/" ]; then
-      length=0
-    fi
-    seg=$(basename -- "$1")
-    starts_with_dir=$( \
-      find -L "$dir" -mindepth 1 -maxdepth 1 -type d \
-          2>/dev/null | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' \
-          | while read -r line; do
+
+    length=$(__zic_calc_lenght "$dir")
+
+    subdirs=$(__zic_list_subdirs "$dir" "${length}")
+
+    local seg=$(basename -- "$1")
+
+    local starts_with_dir=$(\
+      echo "$subdirs" \
+      | while read -r line; do
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
         fi
@@ -48,12 +71,12 @@ __zic_matched_subdir_list() {
         fi
       done
     )
+
     if [ -n "$starts_with_dir" ]; then
       echo "$starts_with_dir"
     else
-      find -L "$dir" -mindepth 1 -maxdepth 1 -type d \
-          2>/dev/null | cut -b $(( ${length} + 2 ))- | command sed '/^$/d' \
-          | while read -r line; do
+      echo "$subdirs" \
+      | while read -r line; do
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
         fi
@@ -98,12 +121,13 @@ _zic_complete() {
     matches=${(q)l}
   else
     matches=$(echo $l \
-        | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} \
-          --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS \
-          --bind '${fzf_bindings}'" ${=fzf} \
-        | while read -r item; do
-      echo -n "${(q)item} "
-    done)
+      | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} \
+        --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS \
+        --bind '${fzf_bindings}'" ${=fzf} \
+      | while read -r item; do
+        echo -n "${(q)item} "
+      done
+    )
   fi
 
   matches=${matches% }
