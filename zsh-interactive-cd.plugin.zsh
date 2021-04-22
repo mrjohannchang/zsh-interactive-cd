@@ -66,8 +66,14 @@ __zic_matched_subdir_list() {
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
         fi
-        if [[ "$line" == "$seg"* ]]; then
-          echo "$line"
+        if [ "$zic_case_insensitive" = "true" ]; then
+          if [[ "$line:u" == "$seg:u"* ]]; then
+            echo "$line"
+          fi
+        else
+          if [[ "$line" == "$seg"* ]]; then
+            echo "$line"
+          fi
         fi
       done
     )
@@ -80,8 +86,14 @@ __zic_matched_subdir_list() {
         if [[ "${seg[1]}" != "." && "${line[1]}" == "." ]]; then
           continue
         fi
-        if [[ "$line" == *"$seg"* ]]; then
-          echo "$line"
+        if [ "$zic_case_insensitive" = "true" ]; then
+          if [[ "$line:u" == *"$seg:u"* ]]; then
+            echo "$line"
+          fi
+        else
+          if [[ "$line" == *"$seg"* ]]; then
+            echo "$line"
+          fi
         fi
       done
     fi
